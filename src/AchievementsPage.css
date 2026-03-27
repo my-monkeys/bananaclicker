@@ -1,0 +1,174 @@
+.ach-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+/* Progress bar */
+.ach-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ach-progress-bar-wrap {
+  height: 6px;
+  background: #2a1800;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid #3d2600;
+}
+
+.ach-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ff8c00);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.ach-progress-label {
+  font-size: 0.75rem;
+  color: #7a5a2a;
+  text-align: right;
+}
+
+/* Category tabs */
+.ach-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ach-cat-btn {
+  background: #2a1800;
+  border: 1px solid #3d2600;
+  border-radius: 8px;
+  color: #a07040;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ach-cat-btn:hover {
+  border-color: #8a5e00;
+  color: #ffd700;
+}
+
+.ach-cat-btn.active {
+  background: #3d2600;
+  border-color: #ffd700;
+  color: #ffd700;
+}
+
+.ach-cat-count {
+  font-size: 0.65rem;
+  color: #5a3e20;
+  background: #1a0f00;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+}
+
+.ach-cat-btn.active .ach-cat-count {
+  color: #a07040;
+}
+
+/* Section count */
+.ach-section-count {
+  font-size: 0.7rem;
+  color: #5a3e20;
+  text-align: right;
+}
+
+/* Grid */
+.ach-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Card */
+.ach-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  position: relative;
+  transition: all 0.15s;
+}
+
+.ach-card.unlocked {
+  background: linear-gradient(135deg, #2d1e00, #3d2a00);
+  border-color: #6a4a00;
+  box-shadow: 0 0 12px #ffd70011;
+}
+
+.ach-card.unlocked:hover {
+  border-color: #ffd700;
+  box-shadow: 0 0 20px #ffd70022;
+}
+
+.ach-card.locked {
+  background: #1a1200;
+  border-color: #2a1a00;
+  opacity: 0.55;
+}
+
+.ach-card.locked.secret {
+  opacity: 0.4;
+}
+
+.ach-card-emoji {
+  flex-shrink: 0;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ach-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ach-card-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffe0a0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ach-card.locked .ach-card-name {
+  color: #5a3e20;
+}
+
+.ach-card-desc {
+  font-size: 0.72rem;
+  color: #8a6a3a;
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.ach-card.locked .ach-card-desc {
+  color: #3a2a10;
+}
+
+.ach-card.locked.secret .ach-card-desc {
+  color: #5a3e20;
+  font-style: italic;
+}
+
+.ach-card-check {
+  color: #8fbe4a;
+  font-size: 1rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}

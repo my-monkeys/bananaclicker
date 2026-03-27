@@ -1,0 +1,42 @@
+export const SKINS = [
+  {
+    id: 'normal',
+    name: 'Banane classique',
+    pixelId: 'banana',
+    price: 0,
+    desc: 'La vraie. L\'originale. L\'irremplaçable.',
+    cssClass: '',
+  },
+  {
+    id: 'ghost',
+    name: 'Banane fantôme',
+    pixelId: 'banana',
+    price: 2000,
+    desc: 'Elle hante tes clics depuis l\'au-delà.',
+    cssClass: 'skin-ghost',
+  },
+  {
+    id: 'golden',
+    name: 'Banane dorée',
+    pixelId: 'banana',
+    price: 25000,
+    desc: 'Trop belle pour être mangée.',
+    cssClass: 'skin-golden',
+  },
+  {
+    id: 'rainbow',
+    name: 'Banane arc-en-ciel',
+    pixelId: 'banana',
+    price: 100000,
+    desc: 'Elle contient toutes les couleurs et aucun sens.',
+    cssClass: 'skin-rainbow',
+  },
+  {
+    id: 'cosmic',
+    name: 'Banane cosmique',
+    pixelId: 'banana',
+    price: 500000,
+    desc: 'Venue d\'une galaxie lointaine, pour rien.',
+    cssClass: 'skin-cosmic',
+  },
+]

@@ -1,0 +1,151 @@
+.skins-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skins-intro {
+  font-size: 0.75rem;
+  color: #5a3e20;
+  font-style: italic;
+  text-align: center;
+}
+
+.skins-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skin-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.75rem;
+  background: #1e1200;
+  border: 1px solid #2d1a00;
+  border-radius: 10px;
+  transition: all 0.15s;
+}
+
+.skin-card.equipped {
+  background: #2d1e00;
+  border-color: #ffd700;
+  box-shadow: 0 0 12px #ffd70022;
+}
+
+.skin-card.locked {
+  opacity: 0.5;
+}
+
+/* Preview */
+.skin-preview-wrap {
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f0800;
+  border-radius: 50%;
+  border: 2px solid #3d2600;
+  flex-shrink: 0;
+}
+
+.skin-preview {
+  font-size: 1.6rem;
+}
+
+/* Skin effects (previews) */
+.skin-preview.skin-ghost {
+  filter: opacity(0.45) drop-shadow(0 0 8px #aaaaff);
+}
+.skin-preview.skin-golden {
+  filter: drop-shadow(0 0 10px #ffd700) sepia(1) saturate(3) brightness(1.3);
+}
+.skin-preview.skin-rainbow {
+  animation: skinsHueRotate 2s linear infinite;
+}
+.skin-preview.skin-cosmic {
+  filter: drop-shadow(0 0 12px #8844ff) hue-rotate(220deg) brightness(1.2);
+  animation: skinsCosmicPulse 3s ease-in-out infinite;
+}
+
+@keyframes skinsHueRotate {
+  from { filter: drop-shadow(0 0 6px #ffd700) hue-rotate(0deg); }
+  to   { filter: drop-shadow(0 0 6px #ffd700) hue-rotate(360deg); }
+}
+@keyframes skinsCosmicPulse {
+  0%, 100% { filter: drop-shadow(0 0 8px #8844ff) hue-rotate(220deg) brightness(1.2); }
+  50%      { filter: drop-shadow(0 0 18px #cc66ff) hue-rotate(260deg) brightness(1.6); }
+}
+
+/* Info */
+.skin-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.skin-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffe0a0;
+}
+
+.skin-desc {
+  font-size: 0.7rem;
+  color: #7a5a2a;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* Actions */
+.skin-action {
+  flex-shrink: 0;
+}
+
+.skin-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.equipped-badge {
+  color: #8fbe4a;
+  background: #1a300a55;
+  border: 1px solid #4a8a1a44;
+}
+
+.skin-btn {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.equip-btn {
+  background: #2d1a00;
+  border-color: #8a5e00;
+  color: #ffd700;
+}
+.equip-btn:hover {
+  background: #3d2600;
+  border-color: #ffd700;
+}
+
+.buy-btn {
+  background: #2d1a00;
+  border-color: #5a3e00;
+  color: #ffd700;
+}
+.buy-btn:hover:not(:disabled) {
+  background: #3d2600;
+  border-color: #ffd700;
+}
+.buy-btn.cant-afford {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
