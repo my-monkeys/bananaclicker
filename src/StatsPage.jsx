@@ -69,7 +69,7 @@ export default function StatsPage({
     { pixelId: 'timer',    label: 'Temps de jeu',           value: formatTime(timePlayed) },
     { pixelId: 'banana',   label: 'Bananes totales',         value: formatNumber(totalBananas) },
     { pixelId: 'lightning',label: 'Bananes / seconde',       value: formatNumber(effectivePassive) },
-    { pixelId: 'pointup',  label: 'Puissance de clic',       value: '+' + formatNumber(effectiveClick) },
+    { pixelId: 'finger',  label: 'Puissance de clic',       value: '+' + formatNumber(effectiveClick) },
     { pixelId: 'mouse',    label: 'Clics totaux',            value: formatNumber(totalClicks) },
     { pixelId: 'cart',     label: 'Améliorations achetées',  value: formatNumber(totalUpgradesBought) },
     { pixelId: 'star',     label: 'Bananes dorées cliquées', value: formatNumber(goldenClicked) },

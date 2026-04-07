@@ -197,7 +197,7 @@ export const ACHIEVEMENTS = [
     name: 'Boucle infernale',
     description: 'Effectuer 5 prestiges.',
     flavor: 'La folie, c\'est de faire la même chose en espérant un résultat différent.',
-    emoji: '🔄', pixelId: 'cycle', category: 'prestige',
+    emoji: '🔄', pixelId: 'arrows', category: 'prestige',
     condition: s => s.prestigeLevel >= 5,
   },
   {
@@ -377,7 +377,7 @@ export const ACHIEVEMENTS = [
 export const CATEGORIES = [
   { id: 'all',      label: 'Tous',          pixelId: null },
   { id: 'bananes',  label: 'Bananes',       pixelId: 'banana' },
-  { id: 'clics',    label: 'Clics',         pixelId: 'pointup' },
+  { id: 'clics',    label: 'Clics',         pixelId: 'finger' },
   { id: 'upgrades', label: 'Upgrades',      pixelId: 'cart' },
   { id: 'passif',   label: 'Passif',        pixelId: 'sleeping' },
   { id: 'prestige', label: 'Prestige',      pixelId: 'recycle' },

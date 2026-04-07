@@ -14,7 +14,7 @@ import './App.css'
 const SAVE_KEY = 'bananaclicker_save'
 
 const UPGRADES = [
-  { id: 'finger',        name: 'Doigt plus agile',  description: '+1 banane par clic',  baseCost: 10,    costMult: 1.5, effect: { type: 'click',   value: 1   }, pixelId: 'pointup'  },
+  { id: 'finger',        name: 'Doigt plus agile',  description: '+1 banane par clic',  baseCost: 10,    costMult: 1.5, effect: { type: 'click',   value: 1   }, pixelId: 'finger'  },
   { id: 'baby_monkey',   name: 'Bébé singe',         description: '0.1 banane/s',        baseCost: 15,    costMult: 1.6, effect: { type: 'passive', value: 0.1 }, pixelId: 'monkey'   },
   { id: 'banana_tree',   name: 'Bananier',            description: '0.5 banane/s',        baseCost: 100,   costMult: 1.7, effect: { type: 'passive', value: 0.5 }, pixelId: 'tree'     },
   { id: 'monkey_gang',   name: 'Gang de singes',      description: '2 bananes/s',         baseCost: 500,   costMult: 1.8, effect: { type: 'passive', value: 2   }, pixelId: 'muscle'   },
@@ -96,6 +96,18 @@ function getCost(upgrade, count) {
   return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMult, count))
 }
 
+function getMaxBuyable(upgrade, count, budget) {
+  let total = 0
+  let n = 0
+  while (true) {
+    const next = getCost(upgrade, count + n)
+    if (total + next > budget) break
+    total += next
+    n++
+  }
+  return { quantity: n, totalCost: total }
+}
+
 function getMilestoneBadge(count) {
   if (count >= 50) return 3
   if (count >= 25) return 2
@@ -149,6 +161,9 @@ export default function App() {
 
   // Particles
   const [particles, setParticles] = useState([])
+  const [comboLevel, setComboLevel] = useState(0)
+  const [lastBoughtId, setLastBoughtId] = useState(null)
+  const [countBump, setCountBump] = useState(false)
 
   // BPS graph history
   const [bpsHistory,  setBpsHistory]  = useState([])
@@ -175,6 +190,7 @@ export default function App() {
   const goldenTimerRef      = useRef(null)
   const eventTimerRef       = useRef(null)
   const gameStateRef        = useRef({})
+  const comboTimerRef       = useRef(null)
   const goldenBananaRef     = useRef(null)
   const bananasRef          = useRef(INITIAL.bananas + OFFLINE_GAIN)
   const timePlayedRef       = useRef(INITIAL.timePlayed)
@@ -185,8 +201,9 @@ export default function App() {
   const prestigeMult     = 1 + prestigeLevel * 0.25
   const eventClickMult   = activeEvent?.clickMult  ?? 1
   const eventPassiveMult = activeEvent?.passiveMult ?? 1
-  const effectiveClick   = clickPower * prestigeMult * eventClickMult
-  const effectivePassive = passive    * prestigeMult * eventPassiveMult
+  const achBonus         = 1 + unlockedAchs.length * 0.01
+  const effectiveClick   = clickPower * prestigeMult * eventClickMult * achBonus
+  const effectivePassive = passive    * prestigeMult * eventPassiveMult * achBonus
   const prestigeThreshold = 1e6 * Math.pow(2, prestigeLevel)
   const canPrestige       = totalBananas >= prestigeThreshold
   const currentSkin = SKINS.find(s => s.id === equippedSkin) ?? SKINS[0]
@@ -374,7 +391,28 @@ export default function App() {
   const resetIdle = useCallback(() => { lastActionRef.current = Date.now() }, [])
 
   const handleClick = useCallback((e) => {
-    const gain = effectiveClickRef.current
+    const now = Date.now()
+    clickTimestamps.current.push(now)
+    clickTimestamps.current = clickTimestamps.current.filter(t => now - t < 2000)
+    const clicks = clickTimestamps.current.length
+
+    // Combo
+    const combo = clicks >= 20 ? 5 : clicks >= 15 ? 4 : clicks >= 10 ? 3 : clicks >= 5 ? 2 : 1
+    setComboLevel(combo > 1 ? combo : 0)
+    clearTimeout(comboTimerRef.current)
+    comboTimerRef.current = setTimeout(() => setComboLevel(0), 2500)
+
+    // Frenzy
+    if (clicks >= 10) {
+      setFrenzy(true)
+      setTimeout(() => setFrenzy(false), 5000)
+    }
+
+    // Critical click (5% chance, x10)
+    const isCrit = Math.random() < 0.05
+    const critMult = isCrit ? 10 : 1
+
+    const gain = effectiveClickRef.current * combo * critMult
     setBananas(b => b + gain)
     setTotalBananas(t => t + gain)
     setTotalClicks(c => c + 1)
@@ -382,25 +420,23 @@ export default function App() {
     setMonkeyBounce(true)
     setTimeout(() => setMonkeyBounce(false), 150)
 
-    const now = Date.now()
-    clickTimestamps.current.push(now)
-    clickTimestamps.current = clickTimestamps.current.filter(t => now - t < 2000)
-    if (clickTimestamps.current.length >= 10) {
-      setFrenzy(true)
-      setTimeout(() => setFrenzy(false), 5000)
+    if (isCrit) {
+      setCountBump(true)
+      setTimeout(() => setCountBump(false), 300)
     }
 
     const id = now + Math.random()
     const x = e.clientX ?? window.innerWidth / 2
     const y = e.clientY ?? window.innerHeight / 2
     const display = Math.max(1, Math.round(gain))
-    setFloaties(f => [...f, { id, x, y, value: display }])
-    setTimeout(() => setFloaties(f => f.filter(fl => fl.id !== id)), 900)
+    setFloaties(f => [...f, { id, x, y, value: display, crit: isCrit }])
+    setTimeout(() => setFloaties(f => f.filter(fl => fl.id !== id)), isCrit ? 1200 : 900)
 
-    // Particles
-    const newParticles = Array.from({ length: 7 }, (_, i) => {
-      const angle = (i / 7) * Math.PI * 2 + (Math.random() - 0.5) * 0.8
-      const speed = 45 + Math.random() * 55
+    // Particles (more on crit)
+    const pCount = isCrit ? 16 : 7
+    const newParticles = Array.from({ length: pCount }, (_, i) => {
+      const angle = (i / pCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.8
+      const speed = (isCrit ? 70 : 45) + Math.random() * (isCrit ? 80 : 55)
       return { id: Math.random(), x, y, dx: Math.cos(angle) * speed, dy: Math.sin(angle) * speed }
     })
     setParticles(p => [...p, ...newParticles])
@@ -419,6 +455,8 @@ export default function App() {
         return b
       }
       resetIdle()
+      setLastBoughtId(upgrade.id)
+      setTimeout(() => setLastBoughtId(null), 500)
       setUpgradeCounts(c => ({ ...c, [upgrade.id]: c[upgrade.id] + 1 }))
       setTotalUpgradesBought(t => t + 1)
       if (upgrade.effect.type === 'click') setClickPower(p => p + upgrade.effect.value)
@@ -428,6 +466,28 @@ export default function App() {
       return after
     })
   }, [upgradeCounts, resetIdle])
+
+  const buyUpgradeMax = useCallback((upgrade) => {
+    const count = upgradeCounts[upgrade.id]
+    const { quantity, totalCost } = getMaxBuyable(upgrade, count, bananas)
+    if (quantity === 0) {
+      setShake(true)
+      setTimeout(() => setShake(false), 400)
+      return
+    }
+    resetIdle()
+    setLastBoughtId(upgrade.id)
+    setTimeout(() => setLastBoughtId(null), 500)
+    setBananas(b => {
+      const after = b - totalCost
+      if (after < 1 && b >= 100) setWentBroke(true)
+      return after
+    })
+    setUpgradeCounts(c => ({ ...c, [upgrade.id]: c[upgrade.id] + quantity }))
+    setTotalUpgradesBought(t => t + quantity)
+    if (upgrade.effect.type === 'click') setClickPower(p => p + upgrade.effect.value * quantity)
+    else setPassive(p => p + upgrade.effect.value * quantity)
+  }, [upgradeCounts, bananas, resetIdle])
 
   const handleGoldenClick = useCallback(() => {
     if (!goldenBanana) return
@@ -510,10 +570,23 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Background falling bananas */}
+      <div className="bg-bananas">
+        {Array.from({ length: 20 }, (_, i) => (
+          <div key={i} className="bg-banana" style={{
+            left: `${(i * 5.17) % 100}%`,
+            animationDuration: `${10 + (i % 6) * 3}s`,
+            animationDelay: `${-(i * 1.7)}s`,
+          }}>
+            <PixelIcon id="banana" size={16 + (i % 4) * 6} />
+          </div>
+        ))}
+      </div>
+
       {/* Floating +bananas */}
       {floaties.map(f => (
-        <div key={f.id} className="floatie" style={{ left: f.x - 20, top: f.y - 20 }}>
-          +{f.value}<PixelIcon id="banana" size={14} style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: 2 }} />
+        <div key={f.id} className={`floatie ${f.crit ? 'crit' : ''}`} style={{ left: f.x - 20, top: f.y - 20 }}>
+          {f.crit && 'CRIT '}+{f.value}<PixelIcon id="banana" size={f.crit ? 18 : 14} style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: 2 }} />
         </div>
       ))}
 
@@ -640,7 +713,7 @@ export default function App() {
           )}
 
           <div className="banana-count">
-            <span className="count-num">{formatNumber(bananas)}</span>
+            <span className={`count-num ${countBump ? 'bumping' : ''}`}>{formatNumber(bananas)}</span>
             <span className="count-label"> bananes</span>
           </div>
 
@@ -653,21 +726,90 @@ export default function App() {
 
           <div className="total-label">Total : {formatNumber(totalBananas)} <PixelIcon id="banana" size={14} style={{ display: 'inline-block', verticalAlign: 'middle' }} /></div>
 
-          <button
-            className={`banana-btn ${monkeyBounce ? 'bounce' : ''}`}
-            onClick={handleClick}
-          >
-            <span className={`banana-emoji ${currentSkin.cssClass}`}><PixelIcon id="banana" size={80} /></span>
-            <span className="monkey-emoji"><PixelIcon id="monkey" size={30} /></span>
-          </button>
+          <div className="banana-btn-wrapper">
+            {(() => {
+              const babyCount = upgradeCounts.baby_monkey
+              const gangCount = upgradeCounts.monkey_gang
+              const maxPerOrbit = 12
+              const babyOrbits = []
+              let remaining = Math.min(babyCount, 36)
+              let orbitIdx = 0
+              while (remaining > 0) {
+                const n = Math.min(remaining, maxPerOrbit)
+                babyOrbits.push({ count: n, radius: 108 + orbitIdx * 32, speed: 4 + orbitIdx * 1.5 })
+                remaining -= n
+                orbitIdx++
+              }
+              const gangOrbits = []
+              let gRemaining = Math.min(gangCount, 24)
+              let gOrbitIdx = 0
+              const gangBaseRadius = 108 + orbitIdx * 32
+              while (gRemaining > 0) {
+                const n = Math.min(gRemaining, 8)
+                gangOrbits.push({ count: n, radius: gangBaseRadius + gOrbitIdx * 36, speed: 6 + gOrbitIdx * 2 })
+                gRemaining -= n
+                gOrbitIdx++
+              }
+              return (
+                <>
+                  {babyOrbits.map((orbit, oi) =>
+                    Array.from({ length: orbit.count }, (_, i) => (
+                      <div
+                        key={`baby-${oi}-${i}`}
+                        className="orbiting-monkey"
+                        style={{
+                          '--orbit-angle': `${(360 / orbit.count) * i}deg`,
+                          '--orbit-delay': `${-(i * (orbit.speed / orbit.count))}s`,
+                          '--orbit-radius': `${orbit.radius}px`,
+                          '--orbit-speed': `${orbit.speed}s`,
+                        }}
+                      >
+                        <PixelIcon id="monkey" size={22} />
+                      </div>
+                    ))
+                  )}
+                  {gangOrbits.map((orbit, oi) =>
+                    Array.from({ length: orbit.count }, (_, i) => (
+                      <div
+                        key={`gang-${oi}-${i}`}
+                        className="orbiting-monkey orbiting-gang"
+                        style={{
+                          '--orbit-angle': `${(360 / orbit.count) * i}deg`,
+                          '--orbit-delay': `${-(i * (orbit.speed / orbit.count))}s`,
+                          '--orbit-radius': `${orbit.radius}px`,
+                          '--orbit-speed': `${orbit.speed}s`,
+                        }}
+                      >
+                        <PixelIcon id="muscle" size={26} />
+                      </div>
+                    ))
+                  )}
+                </>
+              )
+            })()}
+            <button
+              className={`banana-btn ${monkeyBounce ? 'bounce' : ''}`}
+              onClick={handleClick}
+            >
+              <span className={`banana-emoji ${currentSkin.cssClass}`}><PixelIcon id="banana" size={80} /></span>
+              <span className="monkey-emoji"><PixelIcon id="monkey" size={30} /></span>
+            </button>
+          </div>
+
+          {comboLevel > 1 && (
+            <div className="combo-counter" key={comboLevel}>
+              <PixelIcon id="lightning" size={16} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> x{comboLevel} COMBO
+            </div>
+          )}
 
           <div className="click-power">
             +{formatNumber(effectiveClick)} par clic
             {eventClickMult > 1 && <span className="mult-pill">×{eventClickMult}</span>}
+            {unlockedAchs.length > 0 && <span className="mult-pill ach-mult">+{unlockedAchs.length}%</span>}
           </div>
 
           <div className="stats-row">
-            <span><PixelIcon id="pointup" size={14} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> {formatNumber(totalClicks)}</span>
+            <span><PixelIcon id="finger" size={14} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> {formatNumber(totalClicks)}</span>
             <span><PixelIcon id="trophy" size={14} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> {unlockedAchs.length}/{ACHIEVEMENTS.length}</span>
             <span><PixelIcon id="timer" size={14} style={{ display: 'inline-block', verticalAlign: 'middle' }} /> {formatTime(timePlayed)}</span>
           </div>
@@ -710,12 +852,9 @@ export default function App() {
                   const cost      = getCost(upgrade, count)
                   const canAfford = bananas >= cost
                   const badge     = getMilestoneBadge(count)
+                  const { quantity: maxQty, totalCost: maxCost } = getMaxBuyable(upgrade, count, bananas)
                   return (
-                    <button
-                      key={upgrade.id}
-                      className={`upgrade-btn ${canAfford ? 'affordable' : 'expensive'} ${shake && !canAfford ? 'shake' : ''}`}
-                      onClick={() => buyUpgrade(upgrade)}
-                    >
+                    <div key={upgrade.id} className={`upgrade-row ${canAfford ? 'affordable' : 'expensive'} ${shake && !canAfford ? 'shake' : ''} ${lastBoughtId === upgrade.id ? 'just-bought' : ''}`}>
                       <span className="upgrade-emoji"><PixelIcon id={upgrade.pixelId} size={28} /></span>
                       <div className="upgrade-info">
                         <div className="upgrade-name">
@@ -725,10 +864,17 @@ export default function App() {
                         <div className="upgrade-desc">{upgrade.description}</div>
                       </div>
                       <div className="upgrade-right">
-                        <div className="upgrade-cost">{formatNumber(cost)} <PixelIcon id="banana" size={12} style={{ display: 'inline-block', verticalAlign: 'middle' }} /></div>
                         {count > 0 && <div className="upgrade-count">×{count}</div>}
                       </div>
-                    </button>
+                      <div className="upgrade-buttons">
+                        <button className="buy-btn buy-one" disabled={!canAfford} onClick={() => buyUpgrade(upgrade)}>
+                          ×1 — {formatNumber(cost)} <PixelIcon id="banana" size={10} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+                        </button>
+                        <button className="buy-btn buy-max" disabled={maxQty === 0} onClick={() => buyUpgradeMax(upgrade)}>
+                          Max ({maxQty}) — {maxQty > 0 ? formatNumber(maxCost) : '—'} <PixelIcon id="banana" size={10} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+                        </button>
+                      </div>
+                    </div>
                   )
                 })}
               </div>
