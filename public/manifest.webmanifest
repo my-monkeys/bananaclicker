@@ -1,0 +1,27 @@
+{
+  "name": "Banana Clicker - Le jeu clicker pixel art",
+  "short_name": "Banana Clicker",
+  "description": "Jeu clicker pixel art : récolte des bananes, débloque des skins et accumule des achievements.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1a1a",
+  "theme_color": "#f5c518",
+  "lang": "fr-FR",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "/icons/banana.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

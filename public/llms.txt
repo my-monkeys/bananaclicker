@@ -1,0 +1,63 @@
+# Banana Clicker
+
+> Banana Clicker est un jeu idle clicker en pixel art, jouable gratuitement dans le navigateur. Récolte des bananes en cliquant, débloque des skins, accumule des achievements et progresse dans ce clicker addictif à l'esthétique rétro jaune banane.
+
+## À propos
+
+- **Genre** : Idle / Clicker / Casual
+- **Plateforme** : Web (navigateur, desktop et mobile)
+- **Langue** : Français
+- **Prix** : Gratuit, sans inscription, sans pub
+- **Studio** : My-Monkey (collectif Montpellier)
+- **URL** : https://clicker.my-monkey.fr/
+
+## Concept
+
+Banana Clicker reprend les codes des jeux clicker (Cookie Clicker, Clicker Heroes) avec une identité 100% banane et une direction artistique pixel art chaleureuse. Le joueur clique sur une banane géante pour en récolter, dépense ses gains en améliorations (auto-clickers, multiplicateurs, skins) et débloque progressivement un catalogue d'achievements.
+
+## Fonctionnalités principales
+
+- Gameplay clicker classique avec progression exponentielle
+- Système d'améliorations et d'auto-clickers
+- Collection de skins de banane à débloquer
+- Système d'achievements et de progression
+- Sauvegarde locale automatique
+- Pixel art rétro avec palette jaune/ocre
+- Responsive desktop et mobile
+- Sons et animations satisfaisantes au clic
+
+## Public cible
+
+- Amateurs de jeux idle/clicker
+- Joueurs casual cherchant une pause courte ou longue
+- Fans de pixel art et de jeux rétro
+- Francophones (interface en français)
+
+## Stack technique
+
+- React 18 + Vite
+- Firebase (optionnel, pour scores globaux)
+- Hébergement statique optimisé
+- PWA-ready (manifest + icônes)
+
+## Écosystème My-Monkey
+
+Banana Clicker fait partie de la galaxie de jeux My-Monkey aux côtés de :
+- https://alloc-warrior.my-monkey.fr - RPG administratif
+- https://arcade.my-monkey.fr - Borne d'arcade rétro
+- https://chirurgien.my-monkey.fr - Simulation chirurgicale
+- https://papers.my-monkey.fr - Générateur de papiers de recherche
+
+My-Monkey est un collectif créatif de développeurs basé à Montpellier, porté par une association loi 1901 qui propose aussi des formations gratuites en développement web, design UI/UX et culture numérique.
+
+## Liens
+
+- Jeu : https://clicker.my-monkey.fr/
+- Collectif My-Monkey : https://my-monkey.fr
+- Association : https://asso.my-monkey.fr
+- Support : https://support.my-monkey.fr
+- Instagram : https://instagram.com/my.monkey.fr
+
+## Politique IA
+
+Ce site est librement indexable par les moteurs de recherche et les assistants IA. Les citations et résumés sont encouragés avec attribution à "Banana Clicker" et lien vers https://clicker.my-monkey.fr/.
