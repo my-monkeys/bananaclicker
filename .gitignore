@@ -2,3 +2,12 @@ node_modules
 dist
 .DS_Store
 firebase-debug.log
+
+# RuFlo / claude-flow artifacts (untracked)
+.claude-flow/
+.claude/agents/
+.claude/commands/
+.claude/helpers/
+.claude/skills/
+.claude/worktrees/
+.claude/settings.json
